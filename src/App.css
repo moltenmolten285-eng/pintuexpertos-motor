@@ -1,0 +1,30 @@
+/* Estilos globales para PintuExpertos */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Un degradado elegante de azul a verde agua (colores de construcción/limpieza) */
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+.App {
+  text-align: center;
+  padding-bottom: 50px;
+}
+
+/* Animación suave para cuando carguen los colores */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.motor-container {
+  animation: fadeIn 0.8s ease-in;
+}
