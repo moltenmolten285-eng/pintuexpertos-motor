@@ -4,66 +4,41 @@ import { collection, getDocs } from 'firebase/firestore';
 
 const MotorColores = () => {
   const [colores, setColores] = useState([]);
-  const [busqueda, setBusqueda] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchColores = async () => {
+    const obtenerDatos = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "colores"));
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setColores(data);
+        const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setColores(docs);
+        setLoading(false);
       } catch (error) {
-        console.error("Error cargando colores:", error);
+        console.error("Error en Firebase:", error);
+        setLoading(false);
       }
     };
-    fetchColores();
+    obtenerDatos();
   }, []);
 
-  const filtrados = colores.filter(c => 
-    c.nombre?.toLowerCase().includes(busqueda.toLowerCase()) || 
-    c.codigo?.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  if (loading) return <div style={{padding: '20px'}}>Cargando colores de PintuExpertos...</div>;
 
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', color: '#333' }}>PintuExpertos - Catálogo</h1>
-      
-      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <input 
-          type="text" 
-          placeholder="Busca por nombre o código..." 
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          style={{ padding: '10px', width: '80%', maxWidth: '400px', borderRadius: '20px', border: '1px solid #ccc' }}
-        />
-      </div>
-
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h2 style={{ textAlign: 'center' }}>Panel de Colores</h2>
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', 
         gap: '20px' 
       }}>
-        {filtrados.map(color => (
-          <div key={color.id} style={{ 
-            backgroundColor: '#fff', 
-            borderRadius: '12px', 
-            padding: '15px', 
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            textAlign: 'center'
-          }}>
-            <div style={{ 
-              backgroundColor: color.hex, 
-              height: '100px', 
-              borderRadius: '8px', 
-              marginBottom: '10px',
-              border: '1px solid #eee'
-            }}></div>
-            <strong style={{ display: 'block', fontSize: '14px' }}>{color.nombre}</strong>
-            <small style={{ color: '#888' }}>{color.marca} - {color.codigo}</small>
+        {colores.map((c) => (
+          <div key={c.id} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '10px', textAlign: 'center', backgroundColor: '#fff' }}>
+            <div style={{ backgroundColor: c.hex || '#ccc', height: '80px', borderRadius: '8px', marginBottom: '10px' }}></div>
+            <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{c.nombre || 'Sin nombre'}</div>
+            <div style={{ fontSize: '12px', color: '#666' }}>{c.codigo}</div>
           </div>
         ))}
       </div>
-      {filtrados.length === 0 && <p style={{textAlign: 'center'}}>No se encontraron colores.</p>}
     </div>
   );
 };
